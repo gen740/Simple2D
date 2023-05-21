@@ -6,10 +6,12 @@ namespace Simple2D {
 class App {
  public:
   App();
+  ~App();
+  void createCanvas();
   void run();
 
  private:
-  class Impl;
+  struct Impl;
   std::shared_ptr<Impl> pimpl;
 };
 

@@ -1,0 +1,13 @@
+
+# leak:_CFRuntimeCreateInstance
+# leak:__CFAllocateObject
+# leak:CUIRenderer
+# leak:_objc_rootAllocWithZone
+# leak:cache_set_and_retain
+# leak:*cache_get_retained*
+# leak:class_createInstance
+# leak:CGvImageConverterAllocate
+# leak:NSStringMeasurementCacheKey
+# leak:CGSImageDataHandleCreate
+# leak:img_data_lock
+# leak:CGDisplayColorCurveCreate
