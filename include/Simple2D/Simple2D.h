@@ -17,11 +17,14 @@ class App {
  public:
   App();
   ~App();
-  void createCanvas();
   void run();
 
-  // template <class T>
-  // std::shared_ptr<T> addGeometry();
+  template <class T>
+  std::shared_ptr<T> addGeometry() {
+    auto geometry = std::make_shared<T>();
+    geometries.push_back(geometry);
+    return geometry;
+  }
 
   void addGeometry(const Geometry::Geometry_var&);
 

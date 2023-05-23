@@ -1,8 +1,6 @@
-#pragma once
-
 namespace Simple2D::Shader {
 
-const char* ShaderSrc = R"(
+inline const char* ShaderSrc = R"(
         #include <metal_stdlib>
         using namespace metal;
 

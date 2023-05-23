@@ -2,7 +2,7 @@
 #include <MetalKit/MetalKit.h>
 
 #include <Simple2D/Geometry/Triangle.h>
-#include <Simple2D/Geometry/internal/TrianglePimpl.h>
+#import <Simple2D/Geometry/internal/TrianglePimpl.h>
 #include <iostream>
 #include <memory>
 

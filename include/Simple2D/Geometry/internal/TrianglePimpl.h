@@ -1,7 +1,5 @@
-#pragma once
-
-#include <Metal/Metal.h>
-#include <MetalKit/MetalKit.h>
+#import <Metal/Metal.h>
+#import <MetalKit/MetalKit.h>
 #include <Simple2D/Geometry/Triangle.h>
 
 class Simple2D::Geometry::Triangle::pImpl {
