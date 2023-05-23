@@ -1,24 +1,21 @@
-#include <Foundation/Foundation.h>
-#include <iostream>
-#include <semaphore>
+#include "Simple2D/Simple2D.hpp"
+#include "Simple2D/Geometry/Triangle.hpp"
 
-#include "Simple2D/Geometry/Triangle.h"
-#import "Simple2D/Geometry/internal/TrianglePimpl.h"
-#include "Simple2D/Simple2D.h"
-#import "Simple2D/internal/AppDelegate.h"
-#import "Simple2D/internal/MetalDelegate.h"
-#import "Simple2D/internal/shader.h"
+#import "Simple2D/objc/AppDelegate.h"
+#import "Simple2D/objc/Geometry/Triangle.h"
 
 #define NS_PRIVATE_IMPLEMENTATION
 #define MTL_PRIVATE_IMPLEMENTATION
 #define MTK_PRIVATE_IMPLEMENTATION
 #define CA_PRIVATE_IMPLEMENTATION
-#include <simd/simd.h>
-
 #import <AppKit/AppKit.h>
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
+
+#include <simd/simd.h>
+
+#include <iostream>
 
 #if !__has_feature(objc_arc)
 #error "ARC is off"

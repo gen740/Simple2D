@@ -1,6 +1,6 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#include <Simple2D/Geometry/Triangle.h>
+#include <Simple2D/Geometry/Triangle.hpp>
 
 class Simple2D::Geometry::Triangle::pImpl {
  public:

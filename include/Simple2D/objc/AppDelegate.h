@@ -1,7 +1,7 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#import <Simple2D/Simple2D.h>
-#import <Simple2D/internal/MetalDelegate.h>
+#import <Simple2D/Simple2D.hpp>
+#import <Simple2D/objc/MetalDelegate.h>
 
 @interface MenuController : NSObject
 - (void)appQuit:(id)sender;

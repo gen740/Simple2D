@@ -1,5 +1,5 @@
-#import <Simple2D/internal/AppDelegate.h>
-#import <Simple2D/internal/MetalDelegate.h>
+#import <Simple2D/objc/AppDelegate.h>
+#import <Simple2D/objc/MetalDelegate.h>
 
 @implementation MenuController : NSObject
 - (void)appQuit:(id)sender {

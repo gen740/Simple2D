@@ -1,4 +1,4 @@
-#import <Simple2D/internal/MetalDelegate.h>
+#import "Simple2D/objc/MetalDelegate.h"
 
 @implementation MyMetalDelegate
 - (MyMetalDelegate *_Nonnull)initWithDevice:(NSObject<MTLDevice> *_Nonnull)pDevice

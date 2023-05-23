@@ -1,7 +1,5 @@
-#import <Simple2D/internal/Renderer.h>
-
-#include <Simple2D/Geometry/Triangle.h>
-#import <Simple2D/Geometry/internal/TrianglePimpl.h>
+#import "Simple2D/objc/Renderer.h"
+#import "Simple2D/objc/Geometry/Triangle.h"
 
 Renderer::Renderer(NSObject<MTLDevice> *pDevice,
                    std::list<Simple2D::Geometry::Geometry_var> *geometries)

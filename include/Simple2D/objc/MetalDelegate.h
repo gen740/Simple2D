@@ -1,5 +1,5 @@
-#import "Simple2D/Simple2D.h"
-#import "Simple2D/internal/Renderer.h"
+#import "Simple2D/Simple2D.hpp"
+#import "Simple2D/objc/Renderer.h"
 
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>

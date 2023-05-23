@@ -14,7 +14,8 @@ tasks:
       - cmake --build build
   execute:
     cmds:
-      - ./build/00-window
+      - ./build/01-primitive
   execute-with-san:
     cmds:
-      - ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=leak.supp ./build/00-window
+      - ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=leak.supp ./build/01-primitive
+

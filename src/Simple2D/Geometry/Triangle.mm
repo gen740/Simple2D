@@ -1,8 +1,10 @@
-#include <Metal/Metal.h>
-#include <MetalKit/MetalKit.h>
+#include "Simple2D/Geometry/Triangle.hpp"
 
-#include <Simple2D/Geometry/Triangle.h>
-#import <Simple2D/Geometry/internal/TrianglePimpl.h>
+#import "Simple2D/objc/Geometry/Triangle.h"
+
+#import <Metal/Metal.h>
+#import <MetalKit/MetalKit.h>
+
 #include <iostream>
 #include <memory>
 

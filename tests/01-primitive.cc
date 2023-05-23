@@ -1,8 +1,6 @@
-#include <Simple2D/Simple2D.h>
-
+#include <Simple2D/Geometry/Triangle.hpp>
+#include <Simple2D/Simple2D.hpp>
 #include <iostream>
-
-#include "Simple2D/Geometry/Triangle.h"
 
 int main() {
   using Simple2D::Geometry::Triangle;
