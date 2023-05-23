@@ -12,7 +12,7 @@ class Triangle {
   Triangle(Triangle &&) = delete;
   Triangle &operator=(const Triangle &) = delete;
   Triangle &operator=(Triangle &&) = delete;
-  // explicit Triangle(simd::float3x3 vertexes, simd::float3x3 colors);
+  // Triangle(simd::float3x3 vertexes, simd::float3x3 colors);
 
   simd::float3x3 positions;
   simd::float3x3 colors;

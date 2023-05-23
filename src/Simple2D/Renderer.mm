@@ -1,4 +1,5 @@
 #import "Simple2D/objc/Renderer.h"
+#import "Simple2D/objc/Geometry/Rectangle.h"
 #import "Simple2D/objc/Geometry/Triangle.h"
 
 Renderer::Renderer(NSObject<MTLDevice> *pDevice,
@@ -48,16 +49,18 @@ void Renderer::buildBuffers() {
 void Renderer::draw(MTKView *pView) {
   @autoreleasepool {
     auto *pCmd = [_pCommandQueue commandBuffer];
+
     _semaphore.acquire();
     [pCmd addCompletedHandler:[=](id<MTLCommandBuffer>) { this->_semaphore.release(1); }];
 
-    auto *pRpd = pView.currentRenderPassDescriptor;
-    auto *pEnc = [pCmd renderCommandEncoderWithDescriptor:pRpd];
+    auto *pEnc = [pCmd renderCommandEncoderWithDescriptor:pView.currentRenderPassDescriptor];
 
     [pEnc setRenderPipelineState:_pPSO];
-    for (auto &a : *geometries) {
-      std::visit([&](auto &x) { x->pimpl_->draw(pEnc); }, a);
+
+    for (auto &geometry : *geometries) {
+      std::visit([&](auto &x) { x->pimpl_->draw(pEnc); }, geometry);
     }
+
     [pEnc endEncoding];
     [pCmd presentDrawable:pView.currentDrawable];
     [pCmd commit];

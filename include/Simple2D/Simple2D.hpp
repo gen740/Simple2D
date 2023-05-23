@@ -9,8 +9,10 @@ namespace Simple2D {
 
 namespace Geometry {
 class Triangle;
+class Rectangle;
 
-using Geometry_var = std::variant<std::shared_ptr<Triangle>>;
+using Geometry_var =
+    std::variant<std::shared_ptr<Triangle>, std::shared_ptr<Rectangle>>;
 }  // namespace Geometry
 
 class App {
