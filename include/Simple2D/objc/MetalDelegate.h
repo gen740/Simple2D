@@ -7,6 +7,8 @@
 @interface MyMetalDelegate : NSObject <MTKViewDelegate>
 - (MyMetalDelegate *_Nonnull)initWithDevice:(NSObject<MTLDevice> *_Nonnull)pDevice
                               andGeometries:
-                                  (std::list<Simple2D::Geometry::Geometry_var> *_Nonnull)geometries;
+                                  (std::list<Simple2D::Geometry::Geometry_var> *_Nonnull)geometries
+                                    andView:(MTKView *_Nonnull)view;
 @property(assign, nonatomic) std::shared_ptr<Renderer> renderer;
+@property(strong, nonatomic) MTKView *_Nonnull view_;
 @end

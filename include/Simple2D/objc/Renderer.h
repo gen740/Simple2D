@@ -10,7 +10,7 @@
 class Renderer {
  public:
   explicit Renderer(NSObject<MTLDevice> *pDevice,
-                    std::list<Simple2D::Geometry::Geometry_var> *geometries);
+                    std::list<Simple2D::Geometry::Geometry_var> *geometries, MTKView *view_);
   ~Renderer();
 
   void buildShaders();
@@ -24,6 +24,7 @@ class Renderer {
   NSObject<MTLCommandQueue> *_pCommandQueue;
   NSObject<MTLLibrary> *_pShaderLibrary;
   NSObject<MTLRenderPipelineState> *_pPSO{};
+  MTKView *view_;
   std::list<Simple2D::Geometry::Geometry_var> *geometries;
   static constexpr int kMaxFramesInFlight = 3;
   std::array<NSObject<MTLBuffer> *, kMaxFramesInFlight> _pInstanceDataBuffer{};

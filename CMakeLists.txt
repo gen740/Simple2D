@@ -39,6 +39,7 @@ target_link_libraries(
           "-framework Foundation" #
           "-framework Cocoa" #
           "-framework CoreGraphics" #
+          "-framework CoreImage" #
           "-framework MetalKit" #
 )
 set_property(

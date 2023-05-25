@@ -27,6 +27,7 @@ void Triangle::pImpl::draw(NSObject<MTLRenderCommandEncoder>* enc) const {
   [enc setVertexBuffer:VertexDataBuffer_ offset:0 atIndex:0];
   [enc setVertexBuffer:VertexColorBuffer_ offset:0 atIndex:1];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
+  
 }
 
 }  // namespace Simple2D::Geometry
