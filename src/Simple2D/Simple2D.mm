@@ -1,5 +1,5 @@
-#include "Simple2D/Simple2D.hpp"
-#include "Simple2D/Geometry/Triangle.hpp"
+#include "Simple2D/Simple2D.hh"
+#include "Simple2D/Geometry/Triangle.hh"
 
 #import "Simple2D/objc/AppDelegate.h"
 #import "Simple2D/objc/Geometry/Triangle.h"

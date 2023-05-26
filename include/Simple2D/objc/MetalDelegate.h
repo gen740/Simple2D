@@ -1,4 +1,4 @@
-#import "Simple2D/Simple2D.hpp"
+#import "Simple2D/Simple2D.hh"
 #import "Simple2D/objc/Renderer.h"
 
 #import <Metal/Metal.h>

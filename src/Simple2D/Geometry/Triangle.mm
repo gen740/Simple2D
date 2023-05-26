@@ -1,4 +1,4 @@
-#include "Simple2D/Geometry/Triangle.hpp"
+#include "Simple2D/Geometry/Triangle.hh"
 
 #import "Simple2D/objc/Geometry/Triangle.h"
 

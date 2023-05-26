@@ -1,6 +1,6 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#include <Simple2D/Geometry/Rectangle.hpp>
+#include <Simple2D/Geometry/Rectangle.hh>
 
 class Simple2D::Geometry::Rectangle::pImpl {
  public:

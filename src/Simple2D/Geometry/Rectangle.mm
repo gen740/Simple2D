@@ -1,4 +1,4 @@
-#include "Simple2D/Geometry/Rectangle.hpp"
+#include "Simple2D/Geometry/Rectangle.hh"
 #include <array>
 
 #import "Simple2D/objc/Geometry/Rectangle.h"

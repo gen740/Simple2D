@@ -1,6 +1,6 @@
-#include <Simple2D/Geometry/Rectangle.hpp>
-#include <Simple2D/Geometry/Triangle.hpp>
-#include <Simple2D/Simple2D.hpp>
+#include <Simple2D/Geometry/Rectangle.hh>
+#include <Simple2D/Geometry/Triangle.hh>
+#include <Simple2D/Simple2D.hh>
 #include <iostream>
 
 int main() {

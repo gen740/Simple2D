@@ -1,6 +1,6 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#import <Simple2D/Simple2D.hpp>
+#import <Simple2D/Simple2D.hh>
 #import <Simple2D/objc/MetalDelegate.h>
 
 @interface MenuController : NSObject
