@@ -1,107 +1,145 @@
+#include <AppKit/AppKit.h>
 #import <Simple2D/objc/AppDelegate.h>
 #import <Simple2D/objc/MetalDelegate.h>
 
 #import <CoreImage/CoreImage.h>
 
-@implementation MenuController : NSObject
+@implementation AppDelegate
+- (AppDelegate *)initWithGeometries:(std::list<Simple2D::Geometry::Geometry_var> *)geometries {
+  self.geometries_ = geometries;
+  return self;
+}
+
+- (NSMenu *)createMenuBar_ {  // 1322
+  auto *MainMenu = [[NSMenu alloc] init];
+
+  auto *AppMenuItem = [[NSMenuItem alloc] init];
+  auto *AppMenu = [[NSMenu alloc] initWithTitle:@"AppName"];
+  AppMenuItem.submenu = AppMenu;
+
+  auto *WindowMenuItem = [[NSMenuItem alloc] init];
+  auto *WindowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
+  WindowMenuItem.submenu = WindowMenu;
+
+  // Application Quit
+  auto *AppQuitItem = [AppMenu addItemWithTitle:@"Quit app"
+                                         action:@selector(appQuit:)
+                                  keyEquivalent:@"q"];
+  AppQuitItem.target = self;
+  AppQuitItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+
+  // Window Close
+  auto *CloseWindowItem = [WindowMenu addItemWithTitle:@"Close Window"
+                                                action:@selector(windowClose:)
+                                         keyEquivalent:@"w"];
+  CloseWindowItem.target = self;
+  CloseWindowItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+
+  // Save Image
+  auto *SaveImageItem = [WindowMenu addItemWithTitle:@"Save as png"
+                                              action:@selector(saveAction:)
+                                       keyEquivalent:@"s"];
+  SaveImageItem.target = self;
+  SaveImageItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+
+  [MainMenu addItem:AppMenuItem];
+  [MainMenu addItem:WindowMenuItem];
+
+  return MainMenu;
+}
+
+- (void)applicationWillFinishLaunching:(NSNotification *)pNotification {
+  NSApplication *pApp = pNotification.object;
+  pApp.menu = self.createMenuBar_;
+  [pApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)pNotification {
+  self.window_ =
+      [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 512, 512)
+                                  styleMask:NSWindowStyleMaskClosable | NSWindowStyleMaskTitled
+                                    backing:NSBackingStoreBuffered
+                                      defer:NO];
+  [self.window_ center];
+  self.device_ = MTLCreateSystemDefaultDevice();
+  self.metalView_ = [[MTKView alloc] initWithFrame:NSMakeRect(100, 100, 512, 512)
+                                            device:self.device_];
+  (self.metalView_).colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+  (self.metalView_).clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 1.0);
+
+  self.metalDelegate_ = [[MyMetalDelegate alloc] initWithDevice:self.device_
+                                                  andGeometries:self.geometries_
+                                                        andView:self.metalView_];
+  (self.metalView_).delegate = self.metalDelegate_;
+
+  (self.window_).contentView = self.metalView_;
+  (self.window_).title = @"00 - Window";
+  [self.window_ makeKeyAndOrderFront:nil];
+  // auto callback = [=](NSEvent *_Nonnull event) {};
+  // [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyDown handler:callback];
+
+  NSApplication *pApp = pNotification.object;
+  [pApp activateIgnoringOtherApps:TRUE];
+}
+
 - (void)appQuit:(id)sender {
   [[NSApplication sharedApplication] stop:sender];
 }
 - (void)windowClose:(id)sender {
   [[NSApplication sharedApplication].windows.firstObject close];
 }
-@end
 
-@implementation AppDelegate
-- (AppDelegate *)initWithGeometries:(std::list<Simple2D::Geometry::Geometry_var> *)geometries {
-  self.geometries = geometries;
-  return self;
+- (void)saveAction:(id)seder {
+  self.inputWindow_ = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 120)
+                                                  styleMask:NSWindowStyleMaskBorderless
+                                                    backing:NSBackingStoreBuffered
+                                                      defer:NO];
+  // self.inputWindow_.opaque = NO;
+  self.inputWindow_.contentView.wantsLayer = YES;
+  // self.inputWindow_.contentView.layer.frame = self.inputWindow_.contentView.frame;
+  self.inputWindow_.contentView.layer.cornerRadius = 100.0;
+  // self.inputWindow_.contentView.layer.masksToBounds = YES;
+
+  self.textField_ = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 50, 260, 24)];
+  [self.inputWindow_.contentView addSubview:self.textField_];
+
+  auto *inputDialog = [[NSText alloc] initWithFrame:NSMakeRect(20, 80, 260, 20)];
+  [inputDialog setString:@"Input the filename"];
+  [inputDialog setDrawsBackground:NO];
+  [inputDialog setEditable:NO];
+  [inputDialog setSelectable:NO];
+  [self.inputWindow_.contentView addSubview:inputDialog];
+
+  auto *okButton = [[NSButton alloc] initWithFrame:NSMakeRect(160, 20, 120, 20)];
+  okButton.bordered = NO;
+  okButton.title = @"Save as png";
+  okButton.buttonType = NSButtonTypeMomentaryLight;
+  okButton.bezelStyle = NSBezelStyleRoundRect;
+  okButton.target = self;
+  // okButton.contentTintColor = [NSColor MTLCreateSystemDefaultDeice];
+  okButton.wantsLayer = TRUE;
+  okButton.layer.backgroundColor = [NSColor systemBlueColor].CGColor;
+  okButton.action = @selector(saveImage);
+  [self.inputWindow_.contentView addSubview:okButton];
+
+  auto *cancelButton = [[NSButton alloc] initWithFrame:NSMakeRect(20, 20, 120, 20)];
+  cancelButton.bordered = YES;
+  cancelButton.title = @"Cancel";
+  cancelButton.buttonType = NSButtonTypeMomentaryLight;
+  cancelButton.bezelStyle = NSBezelStyleRoundRect;
+  cancelButton.target = self;
+  cancelButton.action = @selector(closeInputWindow);
+  [self.inputWindow_.contentView addSubview:cancelButton];
+
+  [self.inputWindow_ center];
+  [self.inputWindow_ makeKeyAndOrderFront:nil];
+}
+- (void)saveImage {
+  std::cout << self.textField_.stringValue.UTF8String << std::endl;
+  [self.inputWindow_ close];
 }
 
-- (NSMenu *)createMenuBar {  // 1322
-  auto *pMainMenu = [[NSMenu alloc] init];
-  auto *pAppMenuItem = [[NSMenuItem alloc] init];
-  auto *pAppMenu = [[NSMenu alloc] initWithTitle:@"Appname"];
-
-  self.controller = [[MenuController alloc] init];
-  auto *pAppQuitItem = [pAppMenu addItemWithTitle:@"Quit app"
-                                           action:@selector(appQuit:)
-                                    keyEquivalent:@"q"];
-  pAppQuitItem.target = self.controller;
-
-  pAppQuitItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
-  pAppMenuItem.submenu = pAppMenu;
-
-  auto *pWindowMenuItem = [[NSMenuItem alloc] init];
-  auto *pWindowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
-
-  auto *pCloseWindowItem = [pWindowMenu addItemWithTitle:@"Close Window"
-                                                  action:@selector(windowClose:)
-                                           keyEquivalent:@"w"];
-  pCloseWindowItem.target = self.controller;
-  pCloseWindowItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
-  pWindowMenuItem.submenu = pWindowMenu;
-
-  [pMainMenu addItem:pAppMenuItem];
-  [pMainMenu addItem:pWindowMenuItem];
-
-  return pMainMenu;
-}
-
-- (void)applicationWillFinishLaunching:(NSNotification *)pNotification {
-  NSApplication *pApp = pNotification.object;
-  pApp.menu = self.createMenuBar;
-  [pApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)pNotification {
-  self.window =
-      [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 512, 512)
-                                  styleMask:NSWindowStyleMaskClosable | NSWindowStyleMaskTitled
-                                    backing:NSBackingStoreBuffered
-                                      defer:NO];
-  [self.window center];
-  self.device = MTLCreateSystemDefaultDevice();
-  self.metal_view = [[MTKView alloc] initWithFrame:NSMakeRect(100, 100, 512, 512)
-                                            device:self.device];
-  (self.metal_view).colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
-  (self.metal_view).clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 1.0);
-
-  self.metal_delegate = [[MyMetalDelegate alloc] initWithDevice:self.device
-                                                  andGeometries:self.geometries
-                                                        andView:self.metal_view];
-  (self.metal_view).delegate = self.metal_delegate;
-
-  (self.window).contentView = self.metal_view;
-  (self.window).title = @"00 - Window";
-  [self.window makeKeyAndOrderFront:nil];
-  auto callback = [=](NSEvent *_Nonnull event) {
-    NSString *characters = [event characters];
-    if ([characters length] != 0U) {
-      unichar character = [characters characterAtIndex:0];
-      if (character == 'q') {
-        [NSApp stop:self];
-      }
-      if (character == 's') {
-        id<MTLTexture> texture = self.metal_view.currentDrawable.texture;
-        auto *ciImage = [CIImage imageWithMTLTexture:texture options:nullptr];
-        auto *nsImage = [[NSImage alloc] initWithSize:ciImage.extent.size];
-        [nsImage addRepresentation:[NSCIImageRep imageRepWithCIImage:ciImage]];
-        auto *imageData = [nsImage TIFFRepresentation];
-        auto *imageRep = [NSBitmapImageRep imageRepWithData:imageData];
-        auto *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0]
-                                                       forKey:NSImageCompressionFactor];
-        imageData = [imageRep representationUsingType:NSBitmapImageFileTypePNG
-                                           properties:imageProps];
-        [imageData writeToFile:@"./foo.png" atomically:NO];
-        std::cout << "Save" << std::endl;
-      }
-    }
-    return event;
-  };
-  [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyDown handler:callback];
-
-  NSApplication *pApp = pNotification.object;
-  [pApp activateIgnoringOtherApps:TRUE];
+- (void)closeInputWindow {
+  [self.inputWindow_ close];
 }
 @end

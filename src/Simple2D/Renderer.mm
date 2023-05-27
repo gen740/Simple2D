@@ -75,11 +75,6 @@ void Renderer::draw(MTKView *pView) {
 
     [pEnc endEncoding];
 
-    if (counter == 60) {
-      auto texture = pView.currentDrawable.texture;
-      std::cout << texture.bufferBytesPerRow << std::endl;
-      auto image = [CIImage imageWithMTLTexture:texture options:nullptr];
-    }
     [pCmd presentDrawable:pView.currentDrawable];
     [pCmd commit];
   }
