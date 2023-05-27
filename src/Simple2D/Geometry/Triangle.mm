@@ -15,10 +15,10 @@ Triangle::Triangle() : pimpl_(std::make_shared<pImpl>(this)) {}
 //     : vertexes(vertexes), colors(colors), pimpl_(std::make_shared<pImpl>(this)) {}
 
 void Triangle::pImpl::buildBuffers(NSObject<MTLDevice>* device) {
-  VertexDataBuffer_ = [device newBufferWithBytes:&triangle->positions
+  VertexDataBuffer_ = [device newBufferWithBytes:&this->parent_->positions
                                           length:sizeof(simd::float3x3)
                                          options:MTLResourceStorageModeManaged];
-  VertexColorBuffer_ = [device newBufferWithBytes:&triangle->colors
+  VertexColorBuffer_ = [device newBufferWithBytes:&this->parent_->colors
                                            length:sizeof(simd::float3x3)
                                           options:MTLResourceStorageModeManaged];
 }
@@ -27,7 +27,6 @@ void Triangle::pImpl::draw(NSObject<MTLRenderCommandEncoder>* enc) const {
   [enc setVertexBuffer:VertexDataBuffer_ offset:0 atIndex:0];
   [enc setVertexBuffer:VertexColorBuffer_ offset:0 atIndex:1];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
-  
 }
 
 }  // namespace Simple2D::Geometry

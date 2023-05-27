@@ -16,10 +16,10 @@ Rectangle::Rectangle() : pimpl_(std::make_shared<pImpl>(this)) {}
 //     : vertexes(vertexes), colors(colors), pimpl_(std::make_shared<pImpl>(this)) {}
 
 void Rectangle::pImpl::buildBuffers(NSObject<MTLDevice>* device) {
-  VertexDataBuffer_ = [device newBufferWithBytes:&rect->positions
+  VertexDataBuffer_ = [device newBufferWithBytes:&this->parent_->positions
                                           length:sizeof(simd::float4x3)
                                          options:MTLResourceStorageModeManaged];
-  VertexColorBuffer_ = [device newBufferWithBytes:&rect->colors
+  VertexColorBuffer_ = [device newBufferWithBytes:&this->parent_->colors
                                            length:sizeof(simd::float4x3)
                                           options:MTLResourceStorageModeManaged];
   std::array<uint16, 6> indexes{0, 1, 2, 0, 2, 3};

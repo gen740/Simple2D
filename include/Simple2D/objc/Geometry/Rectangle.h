@@ -1,23 +1,21 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#include <Simple2D/Geometry/Rectangle.hh>
 
-class Simple2D::Geometry::Rectangle::pImpl {
+#include "Simple2D/Geometry/Rectangle.hh"
+#import "Simple2D/objc/Geometry/Base.h"
+
+namespace Simple2D::Geometry {
+
+class Rectangle::pImpl : public pImplBase<Rectangle> {
  public:
-  pImpl() = delete;
+  using pImplBase::pImplBase;
 
-  pImpl(const pImpl &) = delete;
-  pImpl(pImpl &&) = delete;
-  pImpl &operator=(const pImpl &) = delete;
-  pImpl &operator=(pImpl &&) = delete;
-
-  explicit pImpl(Rectangle *rect) : rect(rect) {}
-  Rectangle *rect;
-
-  void buildBuffers(NSObject<MTLDevice> * /*device*/);
-  void draw(NSObject<MTLRenderCommandEncoder> * /*enc*/) const;
+  void buildBuffers(NSObject<MTLDevice> * /*device*/) override;
+  void draw(NSObject<MTLRenderCommandEncoder> * /*enc*/) const override;
 
   NSObject<MTLBuffer> *VertexDataBuffer_{};
   NSObject<MTLBuffer> *VertexColorBuffer_{};
   NSObject<MTLBuffer> *IndexBuffer_{};
 };
+
+};  // namespace Simple2D::Geometry
