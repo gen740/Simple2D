@@ -1,6 +1,7 @@
 #include <AppKit/AppKit.h>
 #import <Simple2D/objc/AppDelegate.h>
 #import <Simple2D/objc/MetalDelegate.h>
+#import <Simple2D/objc/Window.h>
 
 #import <CoreImage/CoreImage.h>
 
@@ -55,11 +56,7 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)pNotification {
-  self.window_ =
-      [[NSWindow alloc] initWithContentRect:NSMakeRect(100, 100, 512, 512)
-                                  styleMask:NSWindowStyleMaskClosable | NSWindowStyleMaskTitled
-                                    backing:NSBackingStoreBuffered
-                                      defer:NO];
+  self.window_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(100, 100, 512, 512)];
   [self.window_ center];
   self.device_ = MTLCreateSystemDefaultDevice();
   self.metalView_ = [[MTKView alloc] initWithFrame:NSMakeRect(100, 100, 512, 512)
@@ -83,22 +80,14 @@
 }
 
 - (void)appQuit:(id)sender {
-  [[NSApplication sharedApplication] stop:sender];
+  [[NSApplication sharedApplication] terminate:sender];
 }
 - (void)windowClose:(id)sender {
   [[NSApplication sharedApplication].windows.firstObject close];
 }
 
 - (void)saveAction:(id)seder {
-  self.inputWindow_ = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 120)
-                                                  styleMask:NSWindowStyleMaskBorderless
-                                                    backing:NSBackingStoreBuffered
-                                                      defer:NO];
-  // self.inputWindow_.opaque = NO;
-  self.inputWindow_.contentView.wantsLayer = YES;
-  // self.inputWindow_.contentView.layer.frame = self.inputWindow_.contentView.frame;
-  self.inputWindow_.contentView.layer.cornerRadius = 100.0;
-  // self.inputWindow_.contentView.layer.masksToBounds = YES;
+  self.inputWindow_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 120)];
 
   self.textField_ = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 50, 260, 24)];
   [self.inputWindow_.contentView addSubview:self.textField_];

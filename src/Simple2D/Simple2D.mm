@@ -41,9 +41,8 @@ struct Simple2D::App::Impl {
   std::list<Simple2D::Geometry::Geometry_var> *geometries;
 };
 
-Simple2D::App::App() : pimpl(std::make_shared<Simple2D::App::Impl>(&this->geometries)) {}
-Simple2D::App::~App() = default;
-
+Simple2D::App::App() : pimpl(std::make_unique<Simple2D::App::Impl>(&this->geometries)) {}
+Simple2D::App::~App() { std::cout << this->pimpl.get() << std::endl; }
 void Simple2D::App::run() { pimpl->run(); }
 
 void Simple2D::App::addGeometry(const Geometry::Geometry_var &geometry) {

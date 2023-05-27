@@ -33,7 +33,7 @@ class App {
  private:
   std::list<Simple2D::Geometry::Geometry_var> geometries{};
   struct Impl;
-  std::shared_ptr<Impl> pimpl;
+  std::unique_ptr<Impl> pimpl;
 };
 
 }  // namespace Simple2D
