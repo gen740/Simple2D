@@ -24,6 +24,8 @@ class Renderer {
   NSObject<MTLCommandQueue> *_pCommandQueue;
   NSObject<MTLLibrary> *_pShaderLibrary;
   NSObject<MTLRenderPipelineState> *_pPSO{};
+  NSObject<MTLDepthStencilState> *_pDSS;
+
   MTKView *view_;
   std::list<Simple2D::Geometry::Geometry_var> *geometries;
   static constexpr int kMaxFramesInFlight = 3;

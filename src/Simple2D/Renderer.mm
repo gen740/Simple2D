@@ -1,4 +1,5 @@
 #import "Simple2D/objc/Renderer.h"
+#import "Simple2D/objc/Geometry/Line.h"
 #import "Simple2D/objc/Geometry/Rectangle.h"
 #import "Simple2D/objc/Geometry/Triangle.h"
 
@@ -35,10 +36,15 @@ void Renderer::buildShaders() {
   auto pVertexFn = [pLibrary newFunctionWithName:@"vertexMain"];
   auto pFragFn = [pLibrary newFunctionWithName:@"fragmentMain"];
   auto *pDesc = [[MTLRenderPipelineDescriptor alloc] init];
-  [pDesc setVertexFunction:pVertexFn];
-  [pDesc setFragmentFunction:pFragFn];
-  std::cout << view_.colorPixelFormat << std::endl;
+  pDesc.vertexFunction = pVertexFn;
+  pDesc.fragmentFunction = pFragFn;
+  pDesc.rasterSampleCount = this->view_.sampleCount;
   pDesc.colorAttachments[0].pixelFormat = view_.colorPixelFormat;
+  pDesc.depthAttachmentPixelFormat = view_.depthStencilPixelFormat;
+  MTLDepthStencilDescriptor *depthStencilStateDesc = [[MTLDepthStencilDescriptor alloc] init];
+  depthStencilStateDesc.depthCompareFunction = MTLCompareFunctionLess;
+  depthStencilStateDesc.depthWriteEnabled = YES;
+  this->_pDSS = [this->_pDevice newDepthStencilStateWithDescriptor:depthStencilStateDesc];
 
   _pPSO = [_pDevice newRenderPipelineStateWithDescriptor:pDesc error:&pError];
   if (_pPSO == nullptr) {
@@ -60,14 +66,12 @@ void Renderer::draw(MTKView *pView) {
 
     _semaphore.acquire();
 
-    static int counter = 0;
-    counter++;
-
     [pCmd addCompletedHandler:[=](id<MTLCommandBuffer>) { this->_semaphore.release(1); }];
 
     auto *pEnc = [pCmd renderCommandEncoderWithDescriptor:pView.currentRenderPassDescriptor];
 
-    [pEnc setRenderPipelineState:_pPSO];
+    [pEnc setRenderPipelineState:this->_pPSO];
+    [pEnc setDepthStencilState:this->_pDSS];
 
     for (auto &geometry : *geometries) {
       std::visit([&](auto &x) { x->pimpl_->draw(pEnc); }, geometry);

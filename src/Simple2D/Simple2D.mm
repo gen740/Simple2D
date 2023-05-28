@@ -1,8 +1,6 @@
 #include "Simple2D/Simple2D.hh"
-#include "Simple2D/Geometry/Triangle.hh"
 
 #import "Simple2D/objc/AppDelegate.h"
-#import "Simple2D/objc/Geometry/Triangle.h"
 
 #define NS_PRIVATE_IMPLEMENTATION
 #define MTL_PRIVATE_IMPLEMENTATION
@@ -44,7 +42,3 @@ struct Simple2D::App::Impl {
 Simple2D::App::App() : pimpl(std::make_unique<Simple2D::App::Impl>(&this->geometries)) {}
 Simple2D::App::~App() { std::cout << this->pimpl.get() << std::endl; }
 void Simple2D::App::run() { pimpl->run(); }
-
-void Simple2D::App::addGeometry(const Geometry::Geometry_var &geometry) {
-  geometries.push_back(geometry);
-}

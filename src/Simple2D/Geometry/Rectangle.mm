@@ -12,8 +12,6 @@
 namespace Simple2D::Geometry {
 
 Rectangle::Rectangle() : pimpl_(std::make_shared<pImpl>(this)) {}
-// Rectangle::Rectangle(simd::float3x3 vertexes, simd::float3x3 colors)
-//     : vertexes(vertexes), colors(colors), pimpl_(std::make_shared<pImpl>(this)) {}
 
 void Rectangle::pImpl::buildBuffers(NSObject<MTLDevice>* device) {
   VertexDataBuffer_ = [device newBufferWithBytes:&this->parent_->positions

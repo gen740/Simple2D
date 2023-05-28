@@ -8,6 +8,7 @@ namespace Simple2D::Geometry {
 class Triangle {
  public:
   Triangle();
+  Triangle(simd::float3x3 positions, simd::float3x3 colors);
   Triangle(const Triangle &) = delete;
   Triangle(Triangle &&) = delete;
   Triangle &operator=(const Triangle &) = delete;

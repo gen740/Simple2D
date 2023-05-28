@@ -61,8 +61,10 @@
   self.device_ = MTLCreateSystemDefaultDevice();
   self.metalView_ = [[MTKView alloc] initWithFrame:NSMakeRect(100, 100, 512, 512)
                                             device:self.device_];
-  (self.metalView_).colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
-  (self.metalView_).clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 1.0);
+  self.metalView_.depthStencilPixelFormat = MTLPixelFormatDepth32Float;
+  self.metalView_.colorPixelFormat = MTLPixelFormatBGRA8Unorm_sRGB;
+  self.metalView_.clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 1.0);
+  self.metalView_.sampleCount = 4;
 
   self.metalDelegate_ = [[MyMetalDelegate alloc] initWithDevice:self.device_
                                                   andGeometries:self.geometries_

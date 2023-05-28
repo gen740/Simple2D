@@ -11,8 +11,12 @@
 namespace Simple2D::Geometry {
 
 Triangle::Triangle() : pimpl_(std::make_shared<pImpl>(this)) {}
-// Triangle::Triangle(simd::float3x3 vertexes, simd::float3x3 colors)
-//     : vertexes(vertexes), colors(colors), pimpl_(std::make_shared<pImpl>(this)) {}
+
+Triangle::Triangle(simd::float3x3 positions, simd::float3x3 colors)
+    : pimpl_(std::make_shared<pImpl>(this)) {
+  this->positions = positions;
+  this->colors = colors;
+}
 
 void Triangle::pImpl::buildBuffers(NSObject<MTLDevice>* device) {
   VertexDataBuffer_ = [device newBufferWithBytes:&this->parent_->positions

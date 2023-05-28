@@ -1,6 +1,7 @@
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
-#include <Simple2D/Geometry/Triangle.hh>
+#include "Simple2D/Geometry/Triangle.hh"
+#import "Simple2D/objc/Renderer.h"
 
 namespace Simple2D::Geometry {
 
