@@ -52,12 +52,13 @@
 - (void)applicationWillFinishLaunching:(NSNotification *)pNotification {
   NSApplication *pApp = pNotification.object;
   pApp.menu = self.createMenuBar_;
-  [pApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+  pApp.activationPolicy = NSApplicationActivationPolicyRegular;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)pNotification {
   self.window_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(100, 100, 512, 512)];
   [self.window_ center];
+
   self.device_ = MTLCreateSystemDefaultDevice();
   self.metalView_ = [[MTKView alloc] initWithFrame:NSMakeRect(100, 100, 512, 512)
                                             device:self.device_];
@@ -95,10 +96,10 @@
   [self.inputWindow_.contentView addSubview:self.textField_];
 
   auto *inputDialog = [[NSText alloc] initWithFrame:NSMakeRect(20, 80, 260, 20)];
-  [inputDialog setString:@"Input the filename"];
-  [inputDialog setDrawsBackground:NO];
-  [inputDialog setEditable:NO];
-  [inputDialog setSelectable:NO];
+  inputDialog.string = @"Input the filename";
+  inputDialog.drawsBackground = NO;
+  inputDialog.editable = NO;
+  inputDialog.selectable = NO;
   [self.inputWindow_.contentView addSubview:inputDialog];
 
   auto *okButton = [[NSButton alloc] initWithFrame:NSMakeRect(160, 20, 120, 20)];

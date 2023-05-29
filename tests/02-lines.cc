@@ -50,10 +50,10 @@ int main() {
 
   app.addGeometry<Line>(
       std::vector{
-          simd::float3{-0.8F, 0.8F, 0.3F},  //
-          simd::float3{0.8F, -0.8F, 0.1F},  //
-          simd::float3{0.8F, 0.8F, 0.1F},   //
-          simd::float3{-0.8F, -0.8F, 0.1F}  //
+          simd::float3{-0.8F, 0.8F, 0.9F},   //
+          simd::float3{0.8F, -0.8F, 1.0F},   //
+          simd::float3{0.8F, 0.8F, 0.9F},    //
+          simd::float3{-0.8F, -0.8F, 0.9F}  //
       },
       std::vector{
           simd::float3{1.0F, 1.0F, 1.0F},  //

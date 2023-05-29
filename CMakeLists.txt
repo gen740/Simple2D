@@ -61,7 +61,6 @@ else()
 endif()
 
 if(${SIMPLE2D_TESTING})
-
   file(GLOB SIMPLE2D_TESTING_SOURCES ${CMAKE_CURRENT_LIST_DIR}/tests/*.cc)
   foreach(TEST ${SIMPLE2D_TESTING_SOURCES})
     get_filename_component(TEST_NAME ${TEST} NAME_WE)
