@@ -1,5 +1,4 @@
 #include "Simple2D/Simple2D.hh"
-#import "Simple2D/objc/shader.h"
 
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>

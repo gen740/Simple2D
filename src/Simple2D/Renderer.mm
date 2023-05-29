@@ -10,6 +10,7 @@ Renderer::Renderer(NSObject<MTLDevice> *pDevice,
     : view_(view_), geometries(geometries) {
   _pDevice = pDevice;
   _pCommandQueue = [pDevice newCommandQueue];
+  // SIMPLE2D_SHADER
 
   view_.framebufferOnly = NO;
   ((CAMetalLayer *)view_.layer).allowsNextDrawableTimeout = NO;
@@ -20,14 +21,12 @@ Renderer::Renderer(NSObject<MTLDevice> *pDevice,
 }
 
 Renderer::~Renderer() = default;
+#include <iostream>
 
 void Renderer::buildShaders() {
   NSError *pError;
-
-  auto *pLibrary =
-      [_pDevice newLibraryWithSource:[NSString stringWithUTF8String:Simple2D::Shader::ShaderSrc]
-                             options:nullptr
-                               error:&pError];
+  auto *pLibrary = [_pDevice newLibraryWithURL:[NSURL URLWithString:SIMPLE2D_SHADER_LIBRARY]
+                                         error:&pError];
   if (pLibrary == nullptr) {
     std::cout << pError.localizedDescription.UTF8String << std::endl;
     assert(false);

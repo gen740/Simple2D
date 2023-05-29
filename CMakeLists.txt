@@ -17,6 +17,23 @@ endif()
 
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 
+# Building Metal
+
+set(SHADER_SOURCE ${CMAKE_CURRENT_LIST_DIR}/src/Simple2D.metal)
+set(SHADER_AIR ${CMAKE_CURRENT_BINARY_DIR}/Simple2D.air)
+set(SHADER_METALLIB ${CMAKE_CURRENT_BINARY_DIR}/Simple2D.metallib)
+
+find_program(XRUN xrun)
+
+add_custom_command(
+  OUTPUT ${SHADER_METALLIB}
+  COMMAND xcrun -sdk macosx metal -c ${SHADER_SOURCE} -o ${SHADER_AIR} #
+          && xcrun -sdk macosx metallib ${SHADER_AIR} -o ${SHADER_METALLIB}
+  DEPENDS ${SHADER_SOURCE}
+  COMMENT "Building Metal shader")
+
+add_custom_target(simple2d_metallib ALL DEPENDS ${SHADER_METALLIB})
+
 file(
   GLOB
   SIMPLE2D_SOURCES #
@@ -27,11 +44,10 @@ file(
   ${CMAKE_CURRENT_LIST_DIR}/src/**/**/*.mm #
 )
 
-foreach(m ${SIMPLE2D_SOURCES})
-  message(STATUS "SRC ${m}")
-endforeach()
-
 add_library(${PROJECT_NAME} ${SIMPLE2D_SOURCES})
+add_dependencies(${PROJECT_NAME} simple2d_metallib)
+target_compile_definitions(
+  ${PROJECT_NAME} PRIVATE SIMPLE2D_SHADER_LIBRARY=@"${SHADER_METALLIB}")
 
 target_link_libraries(
   ${PROJECT_NAME}
