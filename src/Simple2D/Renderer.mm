@@ -1,16 +1,21 @@
 #import "Simple2D/objc/Renderer.h"
+#include <AppKit/AppKit.h>
+#include <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import "Simple2D/objc/Geometry/Line.h"
 #import "Simple2D/objc/Geometry/Rectangle.h"
 #import "Simple2D/objc/Geometry/Triangle.h"
 
 #include <CoreGraphics/CGImage.h>
+#include <CoreImage/CIContext.h>
+#include <CoreImage/CIImage.h>
+
+#include <ImageIO/ImageIO.h>
 
 Renderer::Renderer(NSObject<MTLDevice> *pDevice,
                    std::list<Simple2D::Geometry::Geometry_var> *geometries, MTKView *view_)
     : view_(view_), geometries(geometries) {
   _pDevice = pDevice;
   _pCommandQueue = [pDevice newCommandQueue];
-  // SIMPLE2D_SHADER
 
   view_.framebufferOnly = NO;
   ((CAMetalLayer *)view_.layer).allowsNextDrawableTimeout = NO;
@@ -25,8 +30,13 @@ Renderer::~Renderer() = default;
 
 void Renderer::buildShaders() {
   NSError *pError;
-  auto *pLibrary = [_pDevice newLibraryWithURL:[NSURL URLWithString:SIMPLE2D_SHADER_LIBRARY]
-                                         error:&pError];
+  auto *pLibrary = [_pDevice
+      newLibraryWithURL:[NSURL URLWithString:[[[NSBundle mainBundle]
+                                                 pathForResource:@"metallib/Simple2D"
+                                                          ofType:@"metallib"]
+                                                 stringByAddingPercentEncodingWithAllowedCharacters:
+                                                     [NSCharacterSet URLUserAllowedCharacterSet]]]
+                  error:&pError];
   if (pLibrary == nullptr) {
     std::cout << pError.localizedDescription.UTF8String << std::endl;
     assert(false);
@@ -63,10 +73,6 @@ void Renderer::draw(MTKView *pView) {
   @autoreleasepool {
     auto *pCmd = [_pCommandQueue commandBuffer];
 
-    _semaphore.acquire();
-
-    [pCmd addCompletedHandler:[=](id<MTLCommandBuffer>) { this->_semaphore.release(1); }];
-
     auto *pEnc = [pCmd renderCommandEncoderWithDescriptor:pView.currentRenderPassDescriptor];
 
     [pEnc setRenderPipelineState:this->_pPSO];
@@ -75,8 +81,21 @@ void Renderer::draw(MTKView *pView) {
     for (auto &geometry : *geometries) {
       std::visit([&](auto &x) { x->pimpl_->draw(pEnc); }, geometry);
     }
-
     [pEnc endEncoding];
+
+    // [pCmd addCompletedHandler:[&](id<MTLCommandBuffer>) {
+
+    //   std::cout << "Save" << std::endl;
+    //   auto *ciImage = [[CIImage alloc] initWithMTLTexture:this->view_.currentDrawable.texture
+    //                                               options:nullptr];
+    //
+    //   CGImageRef cgImage = [[CIContext context] createCGImage:ciImage fromRect:[ciImage extent]];
+    //   NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithCGImage:cgImage];
+    //   NSData *pngData = [bitmapRep representationUsingType:NSBitmapImageFileTypePNG
+    //   properties:@{}];
+    //
+    //   [pngData writeToFile:@"./hoge.png" atomically:NO];
+    // }];
 
     [pCmd presentDrawable:pView.currentDrawable];
     [pCmd commit];
@@ -86,3 +105,5 @@ void Renderer::draw(MTKView *pView) {
 void Renderer::addGeometry(const Simple2D::Geometry::Geometry_var &geometry) {
   geometries->push_back(geometry);
 }
+
+void Renderer::saveImage(NSString *path) {}

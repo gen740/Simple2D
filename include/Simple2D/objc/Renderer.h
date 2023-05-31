@@ -2,6 +2,7 @@
 
 #import <Metal/Metal.h>
 #import <MetalKit/MetalKit.h>
+#import <atomic>
 
 #include <iostream>
 #include <semaphore>
@@ -18,6 +19,14 @@ class Renderer {
   void draw(MTKView *pView);
   void addGeometry(const Simple2D::Geometry::Geometry_var &geometry);
 
+  void saveImage(NSString *path);
+
+  // pause render cycle
+  void pauseDraw() { this->render_flag.store(false); }
+
+  // resume render cycle
+  void resumeDraw() { this->render_flag.store(true); };
+
  private:
   NSObject<MTLDevice> *_pDevice;
   NSObject<MTLCommandQueue> *_pCommandQueue;
@@ -30,4 +39,8 @@ class Renderer {
   static constexpr int kMaxFramesInFlight = 3;
   std::array<NSObject<MTLBuffer> *, kMaxFramesInFlight> _pInstanceDataBuffer{};
   std::counting_semaphore<kMaxFramesInFlight> _semaphore{3};
+
+  std::atomic_bool render_flag{true};
+  std::atomic_bool save_image;
+  std::function<void(id<MTLTexture>)> callback{nullptr};
 };

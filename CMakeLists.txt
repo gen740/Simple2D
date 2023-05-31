@@ -33,6 +33,8 @@ add_custom_command(
   COMMENT "Building Metal shader")
 
 add_custom_target(simple2d_metallib ALL DEPENDS ${SHADER_METALLIB})
+set_source_files_properties(
+  ${SHADER_METALLIB} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/metallib")
 
 file(
   GLOB
@@ -46,8 +48,14 @@ file(
 
 add_library(${PROJECT_NAME} ${SIMPLE2D_SOURCES})
 add_dependencies(${PROJECT_NAME} simple2d_metallib)
-target_compile_definitions(
-  ${PROJECT_NAME} PRIVATE SIMPLE2D_SHADER_LIBRARY=@"${SHADER_METALLIB}")
+
+file(GLOB SIMPLE2D_ICONS ${CMAKE_CURRENT_LIST_DIR}/icons/*.png)
+set_source_files_properties(
+    ${SIMPLE2D_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/icons")
+
+target_sources(${PROJECT_NAME} PUBLIC ${SHADER_METALLIB} ${SIMPLE2D_ICONS})
+# target_compile_definitions( ${PROJECT_NAME} PRIVATE
+# SIMPLE2D_SHADER_LIBRARY=@"${SHADER_METALLIB}")
 
 target_link_libraries(
   ${PROJECT_NAME}
@@ -80,7 +88,7 @@ if(${SIMPLE2D_TESTING})
   file(GLOB SIMPLE2D_TESTING_SOURCES ${CMAKE_CURRENT_LIST_DIR}/tests/*.cc)
   foreach(TEST ${SIMPLE2D_TESTING_SOURCES})
     get_filename_component(TEST_NAME ${TEST} NAME_WE)
-    add_executable(${TEST_NAME} ${TEST})
+    add_executable(${TEST_NAME} MACOSX_BUNDLE ${TEST})
     target_link_libraries(${TEST_NAME} PRIVATE Simple2D "-fsanitize=address")
     set_property(TARGET ${TEST_NAME} PROPERTY CXX_STANDARD 20)
   endforeach()

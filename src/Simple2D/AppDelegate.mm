@@ -56,7 +56,8 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)pNotification {
-  self.window_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(100, 100, 512, 512)];
+  self.window_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(100, 100, 512, 512)
+                                               withFixedSize:YES];
   [self.window_ center];
 
   self.device_ = MTLCreateSystemDefaultDevice();
@@ -75,8 +76,6 @@
   (self.window_).contentView = self.metalView_;
   (self.window_).title = @"00 - Window";
   [self.window_ makeKeyAndOrderFront:nil];
-  // auto callback = [=](NSEvent *_Nonnull event) {};
-  // [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskKeyDown handler:callback];
 
   NSApplication *pApp = pNotification.object;
   [pApp activateIgnoringOtherApps:TRUE];
@@ -90,19 +89,34 @@
 }
 
 - (void)saveAction:(id)seder {
-  self.inputWindow_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 120)];
+  self.metalDelegate_.renderer->pauseDraw();
+  self.inputWindow_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 180)];
 
+  // NSOpenPanel *panel = [NSOpenPanel openPanel];
+  // [panel setCanChooseDirectories:YES];
+  // [panel setCanChooseFiles:NO];
+  //
+  // if ([panel runModal] == NSModalResponseOK) {
+  //   NSURL *url = [[panel URLs] objectAtIndex:0];
+  //   NSLog(@"Directory path: %@", [url path]);
+  // }
+
+  // [NSAlert a]
   self.textField_ = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 50, 260, 24)];
+  self.textField_.bordered = NO;
+
   [self.inputWindow_.contentView addSubview:self.textField_];
 
-  auto *inputDialog = [[NSText alloc] initWithFrame:NSMakeRect(20, 80, 260, 20)];
+  auto *inputDialog = [[NSText alloc] initWithFrame:NSMakeRect(20, 120, 260, 20)];
   inputDialog.string = @"Input the filename";
   inputDialog.drawsBackground = NO;
+  inputDialog.editable = NO;
   inputDialog.editable = NO;
   inputDialog.selectable = NO;
   [self.inputWindow_.contentView addSubview:inputDialog];
 
   auto *okButton = [[NSButton alloc] initWithFrame:NSMakeRect(160, 20, 120, 20)];
+  okButton.action = @selector(saveImage);
   okButton.bordered = NO;
   okButton.title = @"Save as png";
   okButton.buttonType = NSButtonTypeMomentaryLight;
@@ -111,23 +125,59 @@
   // okButton.contentTintColor = [NSColor MTLCreateSystemDefaultDeice];
   okButton.wantsLayer = TRUE;
   okButton.layer.backgroundColor = [NSColor systemBlueColor].CGColor;
-  okButton.action = @selector(saveImage);
+  okButton.layer.cornerRadius = 10.0;
+  // okButton.layer.
   [self.inputWindow_.contentView addSubview:okButton];
 
   auto *cancelButton = [[NSButton alloc] initWithFrame:NSMakeRect(20, 20, 120, 20)];
-  cancelButton.bordered = YES;
+  cancelButton.action = @selector(closeInputWindow);
+  cancelButton.bordered = NO;
   cancelButton.title = @"Cancel";
   cancelButton.buttonType = NSButtonTypeMomentaryLight;
   cancelButton.bezelStyle = NSBezelStyleRoundRect;
   cancelButton.target = self;
-  cancelButton.action = @selector(closeInputWindow);
+  cancelButton.wantsLayer = YES;
+  cancelButton.layer.backgroundColor = [NSColor systemRedColor].CGColor;
+  cancelButton.layer.cornerRadius = 10.0;
   [self.inputWindow_.contentView addSubview:cancelButton];
+
+  auto *directoryField = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 100, 140, 20)];
+  directoryField.stringValue = @"/Users/fujimotogen/Downloads";
+  directoryField.bordered = NO;
+  directoryField.editable = NO;
+  directoryField.selectable = NO;
+  directoryField.alignment = NSTextAlignmentCenter;
+  directoryField.wantsLayer = YES;
+  directoryField.backgroundColor = NSColor.cyanColor;
+  directoryField.textColor = NSColor.blackColor;
+  directoryField.layer.cornerRadius = 10.0;
+  directoryField.layer.borderWidth = 0.0;
+
+  [self.inputWindow_.contentView addSubview:directoryField];
+
+  auto *selectDirectoryButton = [[NSButton alloc] initWithFrame:NSMakeRect(120, 120, 40, 20)];
+  selectDirectoryButton.bordered = NO;
+  selectDirectoryButton.image = [[NSImage alloc]
+      initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"icons/folder@2x"
+                                                             ofType:@"png"]];
+  selectDirectoryButton.buttonType = NSButtonTypeMomentaryLight;
+  selectDirectoryButton.bezelStyle = NSBezelStyleRoundRect;
+  selectDirectoryButton.target = self;
+  selectDirectoryButton.wantsLayer = TRUE;
+  selectDirectoryButton.layer.backgroundColor = [NSColor systemCyanColor].CGColor;
+  selectDirectoryButton.layer.cornerRadius = 10.0;
+
+  [self.inputWindow_.contentView addSubview:selectDirectoryButton];
 
   [self.inputWindow_ center];
   [self.inputWindow_ makeKeyAndOrderFront:nil];
+
+  self.metalDelegate_.renderer->resumeDraw();
 }
+
 - (void)saveImage {
   std::cout << self.textField_.stringValue.UTF8String << std::endl;
+  // self.metalDelegate_.renderer.
   [self.inputWindow_ close];
 }
 
