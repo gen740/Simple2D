@@ -27,13 +27,13 @@ Line::Line(std::vector<float3> positions, std::vector<float3> colors, float widt
     std::cerr << "Does not much size of points and colos in class Line" << std::endl;
     throw std::runtime_error("Geometry Error");
   }
-  pointNum_ = positions_.size();
+  this->pointNum_ = positions_.size();
 }
 
 void Line::addPoint(float3 point, float3 color) {
   this->positions_.push_back(point);
   this->colors_.push_back(color);
-  pointNum_++;
+  this->pointNum_++;
 }
 
 void Line::pImpl::buildBuffers(NSObject<MTLDevice>* device) {
@@ -104,25 +104,31 @@ void Line::pImpl::buildBuffers(NSObject<MTLDevice>* device) {
     colors.push_back(this->parent_->colors_[i]);
   }
 
-  VertexDataBuffer_ = [device newBufferWithBytes:vertexes.data()
-                                          length:2UL * N * sizeof(simd::float3)
-                                         options:MTLResourceStorageModeManaged];
-  VertexColorBuffer_ = [device newBufferWithBytes:colors.data()
-                                           length:2UL * N * sizeof(simd::float3)
+  this->VertexDataBuffer_ = [device newBufferWithBytes:vertexes.data()
+                                                length:2UL * N * sizeof(simd::float3)
+                                               options:MTLResourceStorageModeManaged];
+  this->VertexColorBuffer_ = [device newBufferWithBytes:colors.data()
+                                                 length:2UL * N * sizeof(simd::float3)
+                                                options:MTLResourceStorageModeManaged];
+  this->IndexBuffer_ = [device newBufferWithBytes:indexes.data()
+                                           length:indexes.size() * sizeof(uint16)
                                           options:MTLResourceStorageModeManaged];
-  IndexBuffer_ = [device newBufferWithBytes:indexes.data()
-                                     length:indexes.size() * sizeof(uint16)
-                                    options:MTLResourceStorageModeManaged];
 }
 
 void Line::pImpl::draw(NSObject<MTLRenderCommandEncoder>* enc) const {
-  [enc setVertexBuffer:VertexDataBuffer_ offset:0 atIndex:0];
-  [enc setVertexBuffer:VertexColorBuffer_ offset:0 atIndex:1];
+  [enc setVertexBuffer:this->VertexDataBuffer_ offset:0 atIndex:0];
+  [enc setVertexBuffer:this->VertexColorBuffer_ offset:0 atIndex:1];
   [enc drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                   indexCount:6L * (this->parent_->pointNum_ - 1)
                    indexType:MTLIndexTypeUInt16
-                 indexBuffer:IndexBuffer_
+                 indexBuffer:this->IndexBuffer_
            indexBufferOffset:0];
+}
+
+Line::pImpl::~pImpl() {
+  [this->VertexColorBuffer_ release];
+  [this->VertexColorBuffer_ release];
+  [this->IndexBuffer_ release];
 }
 
 }  // namespace Simple2D::Geometry

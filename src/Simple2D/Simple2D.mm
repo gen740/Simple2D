@@ -15,10 +15,6 @@
 
 #include <iostream>
 
-#if !__has_feature(objc_arc)
-#error "ARC is off"
-#endif
-
 struct Simple2D::App::Impl {
  public:
   explicit Impl(std::list<Simple2D::Geometry::Geometry_var> *geometries) : geometries(geometries) {
@@ -32,7 +28,10 @@ struct Simple2D::App::Impl {
       [pApp_ run];
     }
   }
-  ~Impl() = default;
+  ~Impl() {
+    [this->pApp_ release];
+    [this->delegate_ release];
+  };
 
   AppDelegate *delegate_;
   NSApplication *pApp_;

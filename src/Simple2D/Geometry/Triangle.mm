@@ -19,18 +19,23 @@ Triangle::Triangle(simd::float3x3 positions, simd::float3x3 colors)
 }
 
 void Triangle::pImpl::buildBuffers(NSObject<MTLDevice>* device) {
-  VertexDataBuffer_ = [device newBufferWithBytes:&this->parent_->positions
-                                          length:sizeof(simd::float3x3)
-                                         options:MTLResourceStorageModeManaged];
-  VertexColorBuffer_ = [device newBufferWithBytes:&this->parent_->colors
-                                           length:sizeof(simd::float3x3)
-                                          options:MTLResourceStorageModeManaged];
+  this->VertexDataBuffer_ = [device newBufferWithBytes:&this->parent_->positions
+                                                length:sizeof(simd::float3x3)
+                                               options:MTLResourceStorageModeManaged];
+  this->VertexColorBuffer_ = [device newBufferWithBytes:&this->parent_->colors
+                                                 length:sizeof(simd::float3x3)
+                                                options:MTLResourceStorageModeManaged];
 }
 
 void Triangle::pImpl::draw(NSObject<MTLRenderCommandEncoder>* enc) const {
   [enc setVertexBuffer:VertexDataBuffer_ offset:0 atIndex:0];
   [enc setVertexBuffer:VertexColorBuffer_ offset:0 atIndex:1];
   [enc drawPrimitives:MTLPrimitiveTypeTriangle vertexStart:0 vertexCount:3];
+}
+
+Triangle::pImpl::~pImpl() {
+  [VertexDataBuffer_ release];
+  [VertexColorBuffer_ release];
 }
 
 }  // namespace Simple2D::Geometry

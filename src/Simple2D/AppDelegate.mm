@@ -13,39 +13,39 @@
 
 - (NSMenu *)createMenuBar_ {  // 1322
   auto *MainMenu = [[NSMenu alloc] init];
+  @autoreleasepool {
+    auto *AppMenuItem = [[NSMenuItem alloc] init].autorelease;
+    auto *AppMenu = [[NSMenu alloc] initWithTitle:@"AppName"].autorelease;
+    AppMenuItem.submenu = AppMenu;
 
-  auto *AppMenuItem = [[NSMenuItem alloc] init];
-  auto *AppMenu = [[NSMenu alloc] initWithTitle:@"AppName"];
-  AppMenuItem.submenu = AppMenu;
+    auto *WindowMenuItem = [[NSMenuItem alloc] init].autorelease;
+    auto *WindowMenu = [[NSMenu alloc] initWithTitle:@"Window"].autorelease;
+    WindowMenuItem.submenu = WindowMenu;
 
-  auto *WindowMenuItem = [[NSMenuItem alloc] init];
-  auto *WindowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
-  WindowMenuItem.submenu = WindowMenu;
+    // Application Quit
+    auto *AppQuitItem = [AppMenu addItemWithTitle:@"Quit app"
+                                           action:@selector(appQuit:)
+                                    keyEquivalent:@"q"];
+    AppQuitItem.target = self;
+    AppQuitItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
 
-  // Application Quit
-  auto *AppQuitItem = [AppMenu addItemWithTitle:@"Quit app"
-                                         action:@selector(appQuit:)
-                                  keyEquivalent:@"q"];
-  AppQuitItem.target = self;
-  AppQuitItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+    // Window Close
+    auto *CloseWindowItem = [WindowMenu addItemWithTitle:@"Close Window"
+                                                  action:@selector(windowClose:)
+                                           keyEquivalent:@"w"];
+    CloseWindowItem.target = self;
+    CloseWindowItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
 
-  // Window Close
-  auto *CloseWindowItem = [WindowMenu addItemWithTitle:@"Close Window"
-                                                action:@selector(windowClose:)
-                                         keyEquivalent:@"w"];
-  CloseWindowItem.target = self;
-  CloseWindowItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
+    // Save Image
+    auto *SaveImageItem = [WindowMenu addItemWithTitle:@"Save as png"
+                                                action:@selector(saveAction:)
+                                         keyEquivalent:@"s"];
+    SaveImageItem.target = self;
+    SaveImageItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
 
-  // Save Image
-  auto *SaveImageItem = [WindowMenu addItemWithTitle:@"Save as png"
-                                              action:@selector(saveAction:)
-                                       keyEquivalent:@"s"];
-  SaveImageItem.target = self;
-  SaveImageItem.keyEquivalentModifierMask = NSEventModifierFlagCommand;
-
-  [MainMenu addItem:AppMenuItem];
-  [MainMenu addItem:WindowMenuItem];
-
+    [MainMenu addItem:AppMenuItem];
+    [MainMenu addItem:WindowMenuItem];
+  }
   return MainMenu;
 }
 
@@ -89,90 +89,96 @@
 }
 
 - (void)saveAction:(id)seder {
-  self.metalDelegate_.renderer->pauseDraw();
-  self.inputWindow_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 180)];
+  @autoreleasepool {
+    self.metalDelegate_.renderer->pauseDraw();
+    self.inputWindow_ = [[Simple2DWindow alloc] initWithContentRect:NSMakeRect(0, 0, 300, 180)];
 
-  // NSOpenPanel *panel = [NSOpenPanel openPanel];
-  // [panel setCanChooseDirectories:YES];
-  // [panel setCanChooseFiles:NO];
-  //
-  // if ([panel runModal] == NSModalResponseOK) {
-  //   NSURL *url = [[panel URLs] objectAtIndex:0];
-  //   NSLog(@"Directory path: %@", [url path]);
-  // }
+    // NSOpenPanel *panel = [NSOpenPanel openPanel];
+    // [panel setCanChooseDirectories:YES];
+    // [panel setCanChooseFiles:NO];
+    //
+    // if ([panel runModal] == NSModalResponseOK) {
+    //   NSURL *url = [[panel URLs] objectAtIndex:0];
+    //   NSLog(@"Directory path: %@", [url path]);
+    // }
 
-  // [NSAlert a]
-  self.textField_ = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 50, 260, 24)];
-  self.textField_.bordered = NO;
+    // [NSAlert a]
+    self.textField_ = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 50, 260, 24)];
+    self.textField_.bordered = NO;
 
-  [self.inputWindow_.contentView addSubview:self.textField_];
+    [self.inputWindow_.contentView addSubview:self.textField_];
 
-  auto *inputDialog = [[NSText alloc] initWithFrame:NSMakeRect(20, 120, 260, 20)];
-  inputDialog.string = @"Input the filename";
-  inputDialog.drawsBackground = NO;
-  inputDialog.editable = NO;
-  inputDialog.editable = NO;
-  inputDialog.selectable = NO;
-  [self.inputWindow_.contentView addSubview:inputDialog];
+    auto *inputDialog = [[NSText alloc] initWithFrame:NSMakeRect(20, 120, 260, 20)].autorelease;
+    inputDialog.string = @"Input the filename";
+    inputDialog.drawsBackground = NO;
+    inputDialog.editable = NO;
+    inputDialog.editable = NO;
+    inputDialog.selectable = NO;
+    [self.inputWindow_.contentView addSubview:inputDialog];
 
-  auto *okButton = [[NSButton alloc] initWithFrame:NSMakeRect(160, 20, 120, 20)];
-  okButton.action = @selector(saveImage);
-  okButton.bordered = NO;
-  okButton.title = @"Save as png";
-  okButton.buttonType = NSButtonTypeMomentaryLight;
-  okButton.bezelStyle = NSBezelStyleRoundRect;
-  okButton.target = self;
-  // okButton.contentTintColor = [NSColor MTLCreateSystemDefaultDeice];
-  okButton.wantsLayer = TRUE;
-  okButton.layer.backgroundColor = [NSColor systemBlueColor].CGColor;
-  okButton.layer.cornerRadius = 10.0;
-  // okButton.layer.
-  [self.inputWindow_.contentView addSubview:okButton];
+    auto *okButton = [[NSButton alloc] initWithFrame:NSMakeRect(160, 20, 120, 20)].autorelease;
+    okButton.action = @selector(saveImage);
+    okButton.bordered = NO;
+    okButton.title = @"Save as png";
+    okButton.buttonType = NSButtonTypeMomentaryLight;
+    okButton.bezelStyle = NSBezelStyleRoundRect;
+    okButton.target = self;
+    // okButton.contentTintColor = [NSColor MTLCreateSystemDefaultDeice];
+    okButton.wantsLayer = TRUE;
+    okButton.layer.backgroundColor = [NSColor systemBlueColor].CGColor;
+    okButton.layer.cornerRadius = 10.0;
+    // okButton.layer.
+    [self.inputWindow_.contentView addSubview:okButton];
 
-  auto *cancelButton = [[NSButton alloc] initWithFrame:NSMakeRect(20, 20, 120, 20)];
-  cancelButton.action = @selector(closeInputWindow);
-  cancelButton.bordered = NO;
-  cancelButton.title = @"Cancel";
-  cancelButton.buttonType = NSButtonTypeMomentaryLight;
-  cancelButton.bezelStyle = NSBezelStyleRoundRect;
-  cancelButton.target = self;
-  cancelButton.wantsLayer = YES;
-  cancelButton.layer.backgroundColor = [NSColor systemRedColor].CGColor;
-  cancelButton.layer.cornerRadius = 10.0;
-  [self.inputWindow_.contentView addSubview:cancelButton];
+    auto *cancelButton = [[NSButton alloc] initWithFrame:NSMakeRect(20, 20, 120, 20)].autorelease;
+    cancelButton.action = @selector(closeInputWindow);
+    cancelButton.bordered = NO;
+    cancelButton.title = @"Cancel";
+    cancelButton.buttonType = NSButtonTypeMomentaryLight;
+    cancelButton.bezelStyle = NSBezelStyleRoundRect;
+    cancelButton.target = self;
+    cancelButton.wantsLayer = YES;
+    cancelButton.layer.backgroundColor = [NSColor systemRedColor].CGColor;
+    cancelButton.layer.cornerRadius = 10.0;
+    [self.inputWindow_.contentView addSubview:cancelButton];
 
-  auto *directoryField = [[NSTextField alloc] initWithFrame:NSMakeRect(20, 100, 140, 20)];
-  directoryField.stringValue = @"/Users/fujimotogen/Downloads";
-  directoryField.bordered = NO;
-  directoryField.editable = NO;
-  directoryField.selectable = NO;
-  directoryField.alignment = NSTextAlignmentCenter;
-  directoryField.wantsLayer = YES;
-  directoryField.backgroundColor = NSColor.cyanColor;
-  directoryField.textColor = NSColor.blackColor;
-  directoryField.layer.cornerRadius = 10.0;
-  directoryField.layer.borderWidth = 0.0;
+    auto *directoryField =
+        [[NSTextField alloc] initWithFrame:NSMakeRect(20, 100, 140, 20)].autorelease;
+    directoryField.stringValue = @"/Users/fujimotogen/Downloads";
+    directoryField.bordered = NO;
+    directoryField.editable = NO;
+    directoryField.selectable = NO;
+    directoryField.alignment = NSTextAlignmentCenter;
+    directoryField.wantsLayer = YES;
+    directoryField.backgroundColor = NSColor.cyanColor;
+    directoryField.textColor = NSColor.blackColor;
+    directoryField.layer.cornerRadius = 10.0;
+    directoryField.layer.borderWidth = 0.0;
 
-  [self.inputWindow_.contentView addSubview:directoryField];
+    [self.inputWindow_.contentView addSubview:directoryField];
 
-  auto *selectDirectoryButton = [[NSButton alloc] initWithFrame:NSMakeRect(120, 120, 40, 20)];
-  selectDirectoryButton.bordered = NO;
-  selectDirectoryButton.image = [[NSImage alloc]
-      initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"icons/folder@2x"
-                                                             ofType:@"png"]];
-  selectDirectoryButton.buttonType = NSButtonTypeMomentaryLight;
-  selectDirectoryButton.bezelStyle = NSBezelStyleRoundRect;
-  selectDirectoryButton.target = self;
-  selectDirectoryButton.wantsLayer = TRUE;
-  selectDirectoryButton.layer.backgroundColor = [NSColor systemCyanColor].CGColor;
-  selectDirectoryButton.layer.cornerRadius = 10.0;
+    auto *selectDirectoryButton =
+        [[NSButton alloc] initWithFrame:NSMakeRect(120, 120, 40, 20)].autorelease;
+    selectDirectoryButton.bordered = NO;
+    selectDirectoryButton.image =
+        [[NSImage alloc]
+            initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"icons/folder@2x"
+                                                                   ofType:@"png"]]
+            .autorelease;
+    selectDirectoryButton.buttonType = NSButtonTypeMomentaryLight;
+    selectDirectoryButton.bezelStyle = NSBezelStyleRoundRect;
+    selectDirectoryButton.target = self;
+    selectDirectoryButton.wantsLayer = TRUE;
+    selectDirectoryButton.layer.backgroundColor = [NSColor systemCyanColor].CGColor;
+    selectDirectoryButton.layer.cornerRadius = 10.0;
 
-  [self.inputWindow_.contentView addSubview:selectDirectoryButton];
+    [self.inputWindow_.contentView addSubview:selectDirectoryButton];
 
-  [self.inputWindow_ center];
-  [self.inputWindow_ makeKeyAndOrderFront:nil];
+    [self.inputWindow_ center];
+    [self.inputWindow_ makeKeyAndOrderFront:nil];
 
-  self.metalDelegate_.renderer->resumeDraw();
+    self.metalDelegate_.renderer->resumeDraw();
+  }
 }
 
 - (void)saveImage {

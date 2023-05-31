@@ -11,6 +11,8 @@ class Line::pImpl : public pImplBase<Line> {
  public:
   using pImplBase::pImplBase;
 
+  ~pImpl();
+
   void buildBuffers(NSObject<MTLDevice> * /*device*/) override;
   void draw(NSObject<MTLRenderCommandEncoder> * /*enc*/) const override;
 

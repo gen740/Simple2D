@@ -28,11 +28,11 @@ class Renderer {
   void resumeDraw() { this->render_flag.store(true); };
 
  private:
-  NSObject<MTLDevice> *_pDevice;
-  NSObject<MTLCommandQueue> *_pCommandQueue;
-  NSObject<MTLLibrary> *_pShaderLibrary;
-  NSObject<MTLRenderPipelineState> *_pPSO{};
-  NSObject<MTLDepthStencilState> *_pDSS;
+  NSObject<MTLDevice> *device_;
+  NSObject<MTLCommandQueue> *commandQueue_;
+  NSObject<MTLLibrary> *shaderLibrary_;
+  NSObject<MTLRenderPipelineState> *PSO_{};
+  NSObject<MTLDepthStencilState> *DSS_;
 
   MTKView *view_;
   std::list<Simple2D::Geometry::Geometry_var> *geometries;

@@ -66,10 +66,10 @@ target_link_libraries(
           "-framework CoreImage" #
           "-framework MetalKit" #
 )
-set_property(
-  TARGET ${PROJECT_NAME}
-  APPEND_STRING
-  PROPERTY COMPILE_FLAGS "-fobjc-arc")
+# set_property(
+#   TARGET ${PROJECT_NAME}
+#   APPEND_STRING
+#   PROPERTY COMPILE_FLAGS "-fobjc-arc")
 set_property(TARGET ${PROJECT_NAME} PROPERTY OBJCXX_STANDARD 20)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 

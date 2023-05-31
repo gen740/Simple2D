@@ -14,8 +14,8 @@
 Renderer::Renderer(NSObject<MTLDevice> *pDevice,
                    std::list<Simple2D::Geometry::Geometry_var> *geometries, MTKView *view_)
     : view_(view_), geometries(geometries) {
-  _pDevice = pDevice;
-  _pCommandQueue = [pDevice newCommandQueue];
+  device_ = pDevice;
+  commandQueue_ = [pDevice newCommandQueue];
 
   view_.framebufferOnly = NO;
   ((CAMetalLayer *)view_.layer).allowsNextDrawableTimeout = NO;
@@ -25,63 +25,71 @@ Renderer::Renderer(NSObject<MTLDevice> *pDevice,
   buildBuffers();
 }
 
-Renderer::~Renderer() = default;
-#include <iostream>
+Renderer::~Renderer() {
+  [this->DSS_ release];
+  [this->PSO_ release];
+  [this->shaderLibrary_ release];
+  [this->commandQueue_ release];
+  [this->device_ release];
+};
 
 void Renderer::buildShaders() {
-  NSError *pError;
-  auto *pLibrary = [_pDevice
-      newLibraryWithURL:[NSURL URLWithString:[[[NSBundle mainBundle]
-                                                 pathForResource:@"metallib/Simple2D"
-                                                          ofType:@"metallib"]
-                                                 stringByAddingPercentEncodingWithAllowedCharacters:
-                                                     [NSCharacterSet URLUserAllowedCharacterSet]]]
-                  error:&pError];
-  if (pLibrary == nullptr) {
-    std::cout << pError.localizedDescription.UTF8String << std::endl;
-    assert(false);
-  }
+  @autoreleasepool {
+    NSError *pError;
+    NSString *metallibPath = [[[NSBundle mainBundle] pathForResource:@"metallib/Simple2D"
+                                                              ofType:@"metallib"]
+        stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet
+                                                               URLUserAllowedCharacterSet]];
 
-  auto pVertexFn = [pLibrary newFunctionWithName:@"vertexMain"];
-  auto pFragFn = [pLibrary newFunctionWithName:@"fragmentMain"];
-  auto *pDesc = [[MTLRenderPipelineDescriptor alloc] init];
-  pDesc.vertexFunction = pVertexFn;
-  pDesc.fragmentFunction = pFragFn;
-  pDesc.rasterSampleCount = this->view_.sampleCount;
-  pDesc.colorAttachments[0].pixelFormat = view_.colorPixelFormat;
-  pDesc.depthAttachmentPixelFormat = view_.depthStencilPixelFormat;
-  MTLDepthStencilDescriptor *depthStencilStateDesc = [[MTLDepthStencilDescriptor alloc] init];
-  depthStencilStateDesc.depthCompareFunction = MTLCompareFunctionLess;
-  depthStencilStateDesc.depthWriteEnabled = YES;
-  this->_pDSS = [this->_pDevice newDepthStencilStateWithDescriptor:depthStencilStateDesc];
+    NSObject<MTLLibrary> *shaderLibrary =
+        [device_ newLibraryWithURL:[NSURL URLWithString:metallibPath] error:&pError];
+    this->shaderLibrary_ = shaderLibrary;
+    if (shaderLibrary == nullptr) {
+      std::cout << pError.localizedDescription.UTF8String << std::endl;
+      assert(false);
+    }
 
-  _pPSO = [_pDevice newRenderPipelineStateWithDescriptor:pDesc error:&pError];
-  if (_pPSO == nullptr) {
-    std::cout << pError.localizedDescription.UTF8String << std::endl;
-    assert(false);
+    id<MTLFunction> pVertexFn = [shaderLibrary newFunctionWithName:@"vertexMain"].autorelease;
+    id<MTLFunction> pFragFn = [shaderLibrary newFunctionWithName:@"fragmentMain"].autorelease;
+    auto *pDesc = MTLRenderPipelineDescriptor.alloc.init.autorelease;
+
+    pDesc.vertexFunction = pVertexFn;
+    pDesc.fragmentFunction = pFragFn;
+    pDesc.rasterSampleCount = this->view_.sampleCount;
+    pDesc.colorAttachments[0].pixelFormat = view_.colorPixelFormat;
+    pDesc.depthAttachmentPixelFormat = view_.depthStencilPixelFormat;
+    MTLDepthStencilDescriptor *depthStencilStateDesc = [[MTLDepthStencilDescriptor alloc] init];
+    depthStencilStateDesc.depthCompareFunction = MTLCompareFunctionLess;
+    depthStencilStateDesc.depthWriteEnabled = YES;
+    this->DSS_ = [this->device_ newDepthStencilStateWithDescriptor:depthStencilStateDesc];
+
+    this->PSO_ = [device_ newRenderPipelineStateWithDescriptor:pDesc error:&pError];
+    if (this->PSO_ == nullptr) {
+      std::cout << pError.localizedDescription.UTF8String << std::endl;
+      assert(false);
+    }
   }
-  _pShaderLibrary = pLibrary;
 }
 
 void Renderer::buildBuffers() {
   for (auto &a : *geometries) {
-    std::visit([=](auto &x) { x->pimpl_->buildBuffers(_pDevice); }, a);
+    std::visit([=](auto &x) { x->pimpl_->buildBuffers(device_); }, a);
   }
 }
 
 void Renderer::draw(MTKView *pView) {
   @autoreleasepool {
-    auto *pCmd = [_pCommandQueue commandBuffer];
+    NSObject<MTLCommandBuffer> *cmd = this->commandQueue_.commandBuffer;
+    MTLRenderPassDescriptor *rpd = pView.currentRenderPassDescriptor;
+    NSObject<MTLRenderCommandEncoder> *enc = [cmd renderCommandEncoderWithDescriptor:rpd];
 
-    auto *pEnc = [pCmd renderCommandEncoderWithDescriptor:pView.currentRenderPassDescriptor];
-
-    [pEnc setRenderPipelineState:this->_pPSO];
-    [pEnc setDepthStencilState:this->_pDSS];
+    [enc setRenderPipelineState:this->PSO_];
+    [enc setDepthStencilState:this->DSS_];
 
     for (auto &geometry : *geometries) {
-      std::visit([&](auto &x) { x->pimpl_->draw(pEnc); }, geometry);
+      std::visit([&](auto &x) { x->pimpl_->draw(enc); }, geometry);
     }
-    [pEnc endEncoding];
+    [enc endEncoding];
 
     // [pCmd addCompletedHandler:[&](id<MTLCommandBuffer>) {
 
@@ -97,8 +105,8 @@ void Renderer::draw(MTKView *pView) {
     //   [pngData writeToFile:@"./hoge.png" atomically:NO];
     // }];
 
-    [pCmd presentDrawable:pView.currentDrawable];
-    [pCmd commit];
+    [cmd presentDrawable:pView.currentDrawable];
+    [cmd commit];
   }
 }
 
